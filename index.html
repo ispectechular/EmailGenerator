@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IEP Email Template Helper</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --brand:#756A85; --ok:#16a34a; --ring:#cbd5e1;
+    --out-bg:#f1f5f9; --out-text:#1e293b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--ink)}
+  .wrap{max-width:920px; margin:48px auto; padding:0 16px}
+  .title{font-size:28px; font-weight:800; letter-spacing:.2px; margin:0 0 16px}
+  .subtitle{margin:0 0 24px; color:var(--muted)}
+  .grid{display:grid; gap:16px}
+  @media (min-width: 860px){.grid{grid-template-columns:1fr 1fr}}
+  .card{background:var(--card); border:1px solid #e5e7eb; border-radius:16px; padding:18px 18px 14px; box-shadow:0 10px 20px rgba(2,6,23,.04)}
+  .head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+  .head h2{font-size:18px; margin:0; font-weight:700}
+  label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+  input[type="text"], input[type="date"], input[type="time"], textarea, select{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid #dde3ea; outline:none; background:#fff; color:var(--ink);
+    box-shadow:0 1px 0 rgba(2,6,23,.03) inset;
+  }
+  input:focus, textarea:focus, select:focus{border-color:var(--brand); box-shadow:0 0 0 4px rgba(117,106,133,.15)}
+  .row{display:grid; grid-template-columns:1fr; gap:12px}
+  @media (min-width:680px){.row{grid-template-columns:1.2fr .6fr .6fr}}
+  .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+  button{
+    appearance:none; border:1px solid #d0d5dd; background:#fff; color:#111827; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600
+  }
+  .primary{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .ghost{background:#fff}
+  .small{padding:8px 10px; font-size:13px}
+  .pill{border-radius:999px}
+  .stack{display:grid; gap:10px}
+  .mono{font-family:UI-Monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+  .out{white-space:pre-wrap; background:var(--out-bg); color:var(--out-text); border-radius:12px; padding:14px; min-height:116px; border:1px solid #e2e8f0}
+  .muted{color:var(--muted); font-size:12px}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .ok{color:var(--ok); font-weight:700}
+  .foot{margin-top:20px; color:var(--muted); font-size:12px}
+  .tag{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; font-size:12px; color:#475569; background:#f8fafc}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">IEP Email Template Helper</h1>
+    <p class="subtitle">Generate polished subjects and bodies for the two messages you send most: the initial scheduling email and the reminder.</p>
+
+    <div class="card">
+      <div class="head"><h2>Inputs</h2><span class="tag">Single-file • Offline-ready</span></div>
+      <div class="row">
+        <div>
+          <label for="student">Student name</label>
+          <input id="student" type="text" placeholder="e.g., Alex Johnson" autocomplete="off" />
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input id="date" type="date" />
+        </div>
+        <div>
+          <label for="time">Time</label>
+          <input id="time" type="time" />
+        </div>
+      </div>
+
+      <div class="row2" style="margin-top:12px">
+        <div>
+          <label for="locationSel">Location</label>
+          <select id="locationSel">
+            <option value="Wawasee High School" selected>Wawasee High School</option>
+            <option value="Phone Call">Phone Call</option>
+            <option value="Google Meet">Google Meet</option>
+            <option value="Other">Other…</option>
+          </select>
+        </div>
+        <div id="otherWrap" class="hidden">
+          <label for="locationOther">Other location</label>
+          <input id="locationOther" type="text" placeholder="Type location or link" />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary pill" id="generate">Generate</button>
+        <button class="ghost pill" id="clear">Clear</button>
+        <span class="muted" id="status"></span>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <section class="card">
+        <div class="head"><h2>Scheduled Email</h2></div>
+        <div class="stack">
+          <label>Subject</label>
+          <div class="out mono" id="sub1">Scheduled Annual Case Conference</div>
+          <div class="btns">
+            <button class="small" data-copy="sub1">Copy subject</button>
+          </div>
+          <label>Body</label>
+          <div class="out mono" id="body1">(student name)'s annual case conference meeting is scheduled for (day, date and time) at Wawasee High School. We look forward to meeting with you.</div>
+          <div class="btns">
+            <button class="small" data-copy="body1">Copy body</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="head"><h2>Reminder Email</h2></div>
+        <div class="stack">
+          <label>Subject</label>
+          <div class="out mono" id="sub2">Annual Case Conference Meeting Reminder</div>
+          <div class="btns">
+            <button class="small" data-copy="sub2">Copy subject</button>
+          </div>
+          <label>Body</label>
+          <div class="out mono" id="body2">This is a reminder that (student name) has a scheduled annual case conference meeting scheduled for (day, date, time) at Wawasee High School. We look forward to meeting with you.</div>
+          <div class="btns">
+            <button class="small" data-copy="body2">Copy body</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <p class="foot">Tip: The day of week is auto‑calculated from the date. Your preferred location is saved for next time.</p>
+  </div>
+
+<script>
+(function(){
+  const $ = (sel)=>document.querySelector(sel);
+  const student = $('#student');
+  const date = $('#date');
+  const time = $('#time');
+  const locationSel = $('#locationSel');
+  const otherWrap = $('#otherWrap');
+  const locationOther = $('#locationOther');
+  const status = $('#status');
+  const sub1 = $('#sub1');
+  const body1 = $('#body1');
+  const sub2 = $('#sub2');
+  const body2 = $('#body2');
+
+  // restore saved location choices
+  const savedSel = localStorage.getItem('iep_loc_sel');
+  const savedOther = localStorage.getItem('iep_loc_other');
+  if(savedSel){
+    locationSel.value = savedSel;
+  }
+  if(savedOther){
+    locationOther.value = savedOther;
+  }
+  toggleOther();
+
+  function toggleOther(){
+    if(locationSel.value === 'Other'){
+      otherWrap.classList.remove('hidden');
+    } else {
+      otherWrap.classList.add('hidden');
+    }
+  }
+
+  function dayOfWeek(iso){
+    if(!iso) return '(day)';
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { weekday:'long' });
+  }
+  function niceDate(iso){
+    if(!iso) return '(date)';
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { month:'long', day:'numeric', year:'numeric' });
+  }
+  function niceTime(t){
+    if(!t) return '(time)';
+    try{
+      const [hh, mm] = t.split(':').map(Number);
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      const h12 = ((hh + 11) % 12) + 1;
+      return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+    }catch(e){ return '(time)'; }
+  }
+  function selectedLocation(){
+    if(locationSel.value === 'Other'){
+      return (locationOther.value || '(location)').trim();
+    }
+    return locationSel.value;
+  }
+  function gen(){
+    const n = (student.value||'').trim();
+    const iso = (date.value||'').trim();
+    const t = (time.value||'').trim();
+    const loc = selectedLocation();
+
+    const dStr = dayOfWeek(iso);
+    const dateStr = niceDate(iso);
+    const timeStr = niceTime(t);
+
+    const scheduledBody = `${n ? n+"'" : "(student name)'"}s annual case conference meeting is scheduled for ${dStr}, ${dateStr} at ${timeStr} at ${loc}. We look forward to meeting with you.`;
+
+    const reminderBody = `This is a reminder that ${n || '(student name)'} has a scheduled annual case conference meeting scheduled for ${dStr}, ${dateStr}, ${timeStr} at ${loc}. We look forward to meeting with you.`;
+
+    sub1.textContent = 'Scheduled Annual Case Conference';
+    body1.textContent = scheduledBody;
+    sub2.textContent = 'Annual Case Conference Meeting Reminder';
+    body2.textContent = reminderBody;
+
+    // persist selections
+    localStorage.setItem('iep_loc_sel', locationSel.value);
+    localStorage.setItem('iep_loc_other', locationOther.value || '');
+
+    flash('Generated.');
+  }
+
+  function flash(msg){
+    status.textContent = msg; status.classList.add('ok');
+    setTimeout(()=>{status.textContent=''; status.classList.remove('ok');}, 1800);
+  }
+
+  $('#generate').addEventListener('click', gen);
+  $('#clear').addEventListener('click', ()=>{
+    student.value=''; date.value=''; time.value='';
+    flash('Cleared.');
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(btn=>{
+    btn.addEventListener('click', async()=>{
+      const id = btn.getAttribute('data-copy');
+      const text = document.getElementById(id).textContent;
+      try{ await navigator.clipboard.writeText(text); flash('Copied to clipboard'); }
+      catch(e){
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); flash('Copied'); } catch(e2){ alert('Copy failed'); }
+        ta.remove();
+      }
+    })
+  });
+
+  [student, date, time].forEach(el=>{
+    el.addEventListener('change', gen);
+    el.addEventListener('keyup', (e)=>{ if(e.key==='Enter') gen(); });
+  });
+  locationSel.addEventListener('change', ()=>{ toggleOther(); gen(); });
+  locationOther.addEventListener('input', gen);
+})();
+</script>
+</body>
+</html>
