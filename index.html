@@ -77,6 +77,17 @@
         </div>
       </div>
 
+      <div class="row2" style="margin-top:10px">
+        <div>
+          <label for="ccSel">Special Education Teacher (CC)</label>
+          <select id="ccSel"></select>
+        </div>
+        <div>
+          <label for="ccEmail">Email (auto)</label>
+          <input id="ccEmail" type="text" readonly />
+        </div>
+      </div>
+
       <div class="btns">
         <button class="primary" id="generate">Generate</button>
         <button class="ghost" id="clear">Clear</button>
@@ -110,7 +121,7 @@
       </section>
     </div>
 
-    <p class="muted" style="margin-top:10px">Tip: The day of week is auto‑calculated from the date. Your preferred location is saved for next time.</p>
+    <p class="muted" style="margin-top:10px">Tip: The day of week is auto‑calculated from the date. Your preferred location and CC are saved for next time.</p>
   </div>
 
 <script>
@@ -122,16 +133,36 @@
   const locationSel = $('#locationSel');
   const otherWrap = $('#otherWrap');
   const locationOther = $('#locationOther');
+  const ccSel = $('#ccSel');
+  const ccEmail = $('#ccEmail');
   const status = $('#status');
   const sub1 = $('#sub1');
   const body1 = $('#body1');
   const sub2 = $('#sub2');
   const body2 = $('#body2');
 
+  // --- CC list ---
+  const teachers = [
+    { name: '— CC: select teacher —', email: '' },
+    { name: 'Jesse Ritter', email: 'jritter@wawasee.k12.in.us' },
+    { name: 'Christy Troutman', email: 'ctroutman@wawasee.k12.in.us' },
+    { name: 'Wendy Ortiz', email: 'wortiz@wawasee.k12.in.us' },
+    { name: 'David Shipley', email: 'dshipley@wawasee.k12.in.us' },
+    { name: 'Jill Hackleman', email: 'jhackleman@wawasee.k12.in.us' },
+    { name: 'Kari Baker', email: 'kbaker@wawasee.k12.in.us' },
+  ];
+  function populateCC(){
+    ccSel.innerHTML = teachers.map(t=>`<option value="${t.email}">${t.name}</option>`).join('');
+  }
+  populateCC();
+
+  // restore saved selections
   const savedSel = localStorage.getItem('iep_loc_sel');
   const savedOther = localStorage.getItem('iep_loc_other');
+  const savedCC = localStorage.getItem('iep_cc_email');
   if(savedSel){ locationSel.value = savedSel; }
   if(savedOther){ locationOther.value = savedOther; }
+  if(savedCC){ ccSel.value = savedCC; ccEmail.value = savedCC; }
   toggleOther();
 
   function toggleOther(){
@@ -182,6 +213,7 @@
 
     localStorage.setItem('iep_loc_sel', locationSel.value);
     localStorage.setItem('iep_loc_other', locationOther.value || '');
+    localStorage.setItem('iep_cc_email', ccSel.value || '');
 
     flash('Generated.');
   }
@@ -194,7 +226,8 @@
   function openGmail(which){
     const subject = which===1 ? sub1.textContent : sub2.textContent;
     const body = which===1 ? body1.textContent : body2.textContent;
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const cc = ccSel.value || '';
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}${cc?`&cc=${encodeURIComponent(cc)}`:''}`;
     window.open(url, '_blank', 'noopener');
   }
 
@@ -223,7 +256,9 @@
   });
   locationSel.addEventListener('change', ()=>{ toggleOther(); gen(); });
   locationOther.addEventListener('input', gen);
+  ccSel.addEventListener('change', ()=>{ ccEmail.value = ccSel.value; gen(); });
 })();
 </script>
 </body>
 </html>
+
