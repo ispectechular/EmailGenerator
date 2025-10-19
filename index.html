@@ -3,49 +3,80 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>IEP Email Template Helper</title>
+<title>ACR Companion — IEP Email Tabs</title>
 <style>
   :root{
-    --bg:#f6f7f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --brand:#756A85; --ok:#16a34a; --ring:#cbd5e1; --out-bg:#f1f5f9; --out-text:#1e293b;
+    --bg:#f6f9fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --brand:#756A85; --ok:#16a34a; --ring:#cbd5e1; --out-bg:#f1f5f9; --out-text:#0f172a;
+    --ice1:#e6f3ff; --ice2:#d6eeff; --ice3:#eaf6ff; --ice-glow:#b3e1ff;
   }
   *{box-sizing:border-box}
-  body{margin:0; font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"; background:var(--bg); color:var(--ink)}
+  html,body{height:100%}
+  body{margin:0; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:var(--bg); color:var(--ink);}
+
+  /* Frosted ice animated backdrop */
+  .ice-bg{
+    position:fixed; inset:0; pointer-events:none; z-index:-1;
+    background: radial-gradient(1200px 600px at -10% -10%, var(--ice1), transparent 55%),
+                radial-gradient(900px 500px at 110% 10%, var(--ice2), transparent 50%),
+                radial-gradient(1000px 600px at 50% 110%, var(--ice3), transparent 55%);
+    filter:saturate(1.05) contrast(1.02);
+  }
+  /* subtle drifting ice shimmer */
+  .ice-shimmer{position:fixed; inset:-20%; z-index:-1; pointer-events:none;
+    background: conic-gradient(from 0deg, rgba(255,255,255,.15), rgba(255,255,255,0) 35%, rgba(255,255,255,.15) 70%, rgba(255,255,255,0) 100%);
+    animation: drift 14s linear infinite;
+    mix-blend-mode: screen; opacity:.5; filter: blur(30px);
+  }
+  @keyframes drift{ to{ transform: translate3d(6%, -4%, 0) rotate(360deg);} }
+
   .wrap{max-width:920px; margin:40px auto; padding:0 16px}
   .title{font-size:26px; font-weight:800; margin:0 0 8px}
-  .subtitle{margin:0 0 18px; color:var(--muted)}
-  .grid{display:grid; gap:12px}
-  @media (min-width: 900px){.grid{grid-template-columns:1fr 1fr}}
-  .card{background:var(--card); border:1px solid #e5e7eb; border-radius:14px; padding:14px; box-shadow:0 10px 20px rgba(2,6,23,.04)}
+  .subtitle{margin:0 18px 18px 0; color:var(--muted)}
+
+  .card{background:var(--card); border:1px solid #e5e7eb; border-radius:14px; padding:14px; box-shadow:0 10px 20px rgba(2,6,23,.05); backdrop-filter:saturate(1.1)}
   .head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px}
   .head h2{font-size:16px; margin:0; font-weight:700}
   label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
   input[type="text"], input[type="date"], input[type="time"], select{
     width:100%; padding:10px 12px; border-radius:12px; border:1px solid #dde3ea; outline:none; background:#fff; color:var(--ink);
+    transition: box-shadow .2s, border-color .2s;
   }
-  input:focus, select:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(117,106,133,.15)}
+  input:focus, select:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(117,106,133,.18)}
   .row{display:grid; grid-template-columns:1fr; gap:10px}
   @media (min-width:680px){.row{grid-template-columns:1.2fr .6fr .6fr}}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .btns{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
-  button{appearance:none; border:1px solid #d0d5dd; background:#fff; color:#111827; padding:9px 12px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px}
+  button{appearance:none; border:1px solid #d0d5dd; background:#fff; color:#111827; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px; transition:transform .08s ease, box-shadow .2s}
+  button:active{transform:scale(.98)}
   .primary{background:var(--brand); color:#fff; border-color:var(--brand)}
   .ghost{background:#fff}
-  .mono{font-family:UI-Monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
-  .out{white-space:pre-wrap; background:var(--out-bg); color:var(--out-text); border-radius:10px; padding:10px; min-height:88px; border:1px solid #e2e8f0}
-  .muted{color:var(--muted); font-size:12px}
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .ok{color:var(--ok); font-weight:700}
-  .tag{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; font-size:11px; color:#475569; background:#f8fafc}
-  .hidden{display:none}
   .subject{font-size:13px; color:#0f172a; background:#fafafa; border:1px solid #eaeef3; border-radius:8px; padding:8px 10px}
+  .out{white-space:pre-wrap; background:var(--out-bg); color:var(--out-text); border-radius:12px; padding:12px; min-height:120px; border:1px solid #e2e8f0; box-shadow: inset 0 1px 0 rgba(255,255,255,.6)}
+
+  /* Tabs */
+  .tabs{margin-top:12px}
+  .tabbar{display:flex; gap:0; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(2,6,23,.05)}
+  .tabbar button{flex:1; padding:12px 10px; border:0; background:linear-gradient(180deg,#ffffff,#f8fafc); font-weight:700; color:#334155; letter-spacing:.2px}
+  .tabbar button+button{border-left:1px solid #e5e7eb}
+  .tabbar button[aria-selected="true"]{background:linear-gradient(180deg, #eef7ff, #ffffff); color:#111827; box-shadow: inset 0 -2px 0 var(--ice-glow), 0 8px 16px rgba(59,130,246,.08)}
+
+  .panel{margin-top:12px}
+  .hidden{display:none}
+
+  .muted{color:var(--muted); font-size:12px}
+.actions{display:flex; justify-content:center; gap:10px; margin:14px 0 4px}
 </style>
 </head>
 <body>
+  <div class="ice-bg"></div>
+  <div class="ice-shimmer"></div>
   <div class="wrap">
     <h1 class="title">ACR Companion</h1>
-    <p class="subtitle"></p>
+    <p class="subtitle">Modern, clean, fluid IEP email generator with tabs.</p>
 
+    <!-- Inputs -->
     <div class="card">
-      <div class="head"><h2>Inputs</h2><span class="tag">Single‑file • Offline‑ready</span></div>
+      <div class="head"><h2>Inputs</h2><span class="muted">Single‑file • Offline‑ready</span></div>
       <div class="row">
         <div>
           <label for="student">Student name</label>
@@ -60,203 +91,161 @@
           <input id="time" type="time" />
         </div>
       </div>
-
       <div class="row2" style="margin-top:10px">
         <div>
-          <label for="locationSel">Location</label>
-          <select id="locationSel">
-            <option value="Wawasee High School" selected>Wawasee High School</option>
-            <option value="Phone Call">Phone Call</option>
-            <option value="Google Meet">Google Meet</option>
-            <option value="Other">Other…</option>
-          </select>
+          <label for="location">Location</label>
+          <input id="location" type="text" placeholder="Wawasee High School" value="Wawasee High School" />
         </div>
-        <div id="otherWrap" class="hidden">
-          <label for="locationOther">Other location</label>
-          <input id="locationOther" type="text" placeholder="Type location or link" />
+        <div>
+          <label for="teacher">Teacher Name</label>
+          <input id="teacher" type="text" placeholder="Jesse Ritter" value="Jesse Ritter" />
         </div>
       </div>
-
       <div class="row2" style="margin-top:10px">
         <div>
-          <label for="ccSel">Special Education Teacher (CC)</label>
+          <label for="ccSel">CC (Special Education Teacher)</label>
           <select id="ccSel"></select>
         </div>
-        <div>
-          <label for="ccEmail">Email (auto)</label>
-          <input id="ccEmail" type="text" readonly />
+        <div></div>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="tabs">
+        <div role="tablist" aria-label="Email type" class="tabbar" id="tabbar">
+          <button role="tab" id="tab-invite" aria-controls="panel-invite" aria-selected="false">Invitation</button>
+          <button role="tab" id="tab-follow" aria-controls="panel-follow" aria-selected="true">Follow Up</button>
+          <button role="tab" id="tab-remind" aria-controls="panel-remind" aria-selected="false">Reminder</button>
         </div>
+        
+        <!-- Panels -->
+        <div id="panel-invite" role="tabpanel" aria-labelledby="tab-invite" class="panel hidden">
+          <div class="card" style="margin-top:12px">
+            <label>Subject</label>
+            <div id="subject-invite" class="subject">Scheduling an Annual Case Conference Meeting</div>
+            <label style="margin-top:6px">Body</label>
+            <div id="body-invite" class="out">Hello,
+
+As the time approaches to review (Student First Name)’s Individualized Education Program (IEP), I’d like to schedule our annual case conference meeting. This meeting allows us to share updates on (Student First Name)’s progress, gather your input, and collaborate on plans for the year ahead.
+
+Would (Day), (Date) at (Time) at (Location) work for you? If that time is not convenient, please let me know an alternative that fits your schedule. We can meet in person at Wawasee High School, virtually through Google Meet, or by phone—whichever works best for you.
+
+Please reply to this email or call (574) 457-3147 ext. 2308 to confirm or suggest another option. Thank you for your continued partnership in supporting (Student First Name)’s education.
+
+Sincerely,
+(Teacher Name)
+Special Education Teacher
+Wawasee High School</div>
+          </div>
+        </div>
+
+        <div id="panel-follow" role="tabpanel" aria-labelledby="tab-follow" class="panel">
+          <div class="card" style="margin-top:12px">
+            <label>Subject</label>
+            <div id="subject-follow" class="subject">Scheduled Annual Case Conference</div>
+            <label style="margin-top:6px">Body</label>
+            <div id="body-follow" class="out">(Student Name)'s annual case conference meeting is scheduled for (Day), (Date) at (Time) at (Location). We look forward to meeting with you.</div>
+          </div>
+        </div>
+
+        <div id="panel-remind" role="tabpanel" aria-labelledby="tab-remind" class="panel hidden">
+          <div class="card" style="margin-top:12px">
+            <label>Subject</label>
+            <div id="subject-remind" class="subject">Annual Case Conference Meeting Reminder</div>
+            <label style="margin-top:6px">Body</label>
+            <div id="body-remind" class="out">This is a reminder that (Student Name) has a scheduled annual case conference meeting on (Day), (Date) at (Time) at (Location). We look forward to meeting with you.</div>
+          </div>
+        </div>
+
+      <!-- Centered Actions below message -->
+      <div class="actions">
+        <button class="ghost" id="generate">Generate</button>
+        <button class="primary" id="openGmail">Open Current in Gmail</button>
       </div>
 
-      <div class="btns">
-        <button class="primary" id="generate">Generate</button>
-        <button class="ghost" id="clear">Clear</button>
-        <span class="muted" id="status"></span>
-      </div>
+      <p class="muted" style="margin-top:10px; text-align:center"" style="margin-top:10px">Tip: Follow Up is selected by default. Click tabs to switch which message is shown. "Open Current in Gmail" uses the active tab.</p>
     </div>
-
-    <div class="grid" style="margin-top:12px">
-      <section class="card">
-        <div class="head"><h2>Scheduled Email</h2></div>
-        <label>Subject</label>
-        <div id="sub1" class="subject">Scheduled Annual Case Conference</div>
-        <label style="margin-top:6px">Body</label>
-        <div class="out mono" id="body1">(student name)'s annual case conference meeting is scheduled for (day, date and time) at Wawasee High School. We look forward to meeting with you.</div>
-        <div class="btns">
-          <button class="ghost" data-copy="body1">Copy body</button>
-          <button class="ghost" data-gmail="1">Open in Gmail</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="head"><h2>Reminder Email</h2></div>
-        <label>Subject</label>
-        <div id="sub2" class="subject">Annual Case Conference Meeting Reminder</div>
-        <label style="margin-top:6px">Body</label>
-        <div class="out mono" id="body2">This is a reminder that (student name) has a scheduled annual case conference meeting scheduled for (day, date, time) at Wawasee High School. We look forward to meeting with you.</div>
-        <div class="btns">
-          <button class="ghost" data-copy="body2">Copy body</button>
-          <button class="ghost" data-gmail="2">Open in Gmail</button>
-        </div>
-      </section>
-    </div>
-
-    <p class="muted" style="margin-top:10px">Tip: The day of week is auto‑calculated from the date. Your preferred location and CC are saved for next time.</p>
   </div>
 
 <script>
 (function(){
-  const $ = (sel)=>document.querySelector(sel);
-  const student = $('#student');
-  const date = $('#date');
-  const time = $('#time');
-  const locationSel = $('#locationSel');
-  const otherWrap = $('#otherWrap');
-  const locationOther = $('#locationOther');
-  const ccSel = $('#ccSel');
-  const ccEmail = $('#ccEmail');
-  const status = $('#status');
-  const sub1 = $('#sub1');
-  const body1 = $('#body1');
-  const sub2 = $('#sub2');
-  const body2 = $('#body2');
+  const $ = (id)=>document.getElementById(id);
+  const student=$('student'), date=$('date'), time=$('time'), loc=$('location'), teacher=$('teacher');
+  const ccSel=$('ccSel');
 
-  // --- CC list ---
-  const teachers = [
-    { name: '— CC: select teacher —', email: '' },
-    { name: 'Jesse Ritter', email: 'jritter@wawasee.k12.in.us' },
-    { name: 'Christy Troutman', email: 'ctroutman@wawasee.k12.in.us' },
-    { name: 'Wendy Ortiz', email: 'wortiz@wawasee.k12.in.us' },
-    { name: 'David Shipley', email: 'dshipley@wawasee.k12.in.us' },
-    { name: 'Jill Hackleman', email: 'jhackleman@wawasee.k12.in.us' },
-    { name: 'Kari Baker', email: 'kbaker@wawasee.k12.in.us' },
+  // Tab wiring
+  const tabs=[
+    {btn:$('tab-invite'), panel:$('panel-invite'), sub:$('subject-invite'), body:$('body-invite')},
+    {btn:$('tab-follow'), panel:$('panel-follow'), sub:$('subject-follow'), body:$('body-follow')},
+    {btn:$('tab-remind'), panel:$('panel-remind'), sub:$('subject-remind'), body:$('body-remind')},
   ];
-  function populateCC(){
-    ccSel.innerHTML = teachers.map(t=>`<option value="${t.email}">${t.name}</option>`).join('');
-  }
-  populateCC();
-
-  // restore saved selections
-  const savedSel = localStorage.getItem('iep_loc_sel');
-  const savedOther = localStorage.getItem('iep_loc_other');
-  const savedCC = localStorage.getItem('iep_cc_email');
-  if(savedSel){ locationSel.value = savedSel; }
-  if(savedOther){ locationOther.value = savedOther; }
-  if(savedCC){ ccSel.value = savedCC; ccEmail.value = savedCC; }
-  toggleOther();
-
-  function toggleOther(){
-    if(locationSel.value === 'Other') otherWrap.classList.remove('hidden');
-    else otherWrap.classList.add('hidden');
-  }
-
-  function dayOfWeek(iso){
-    if(!iso) return '(day)';
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString(undefined, { weekday:'long' });
-  }
-  function niceDate(iso){
-    if(!iso) return '(date)';
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString(undefined, { month:'long', day:'numeric', year:'numeric' });
-  }
-  function niceTime(t){
-    if(!t) return '(time)';
-    try{
-      const [hh, mm] = t.split(':').map(Number);
-      const ampm = hh >= 12 ? 'PM' : 'AM';
-      const h12 = ((hh + 11) % 12) + 1;
-      return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
-    }catch(e){ return '(time)'; }
-  }
-  function selectedLocation(){
-    if(locationSel.value === 'Other') return (locationOther.value || '(location)').trim();
-    return locationSel.value;
-  }
-  function gen(){
-    const n = (student.value||'').trim();
-    const iso = (date.value||'').trim();
-    const t = (time.value||'').trim();
-    const loc = selectedLocation();
-
-    const dStr = dayOfWeek(iso);
-    const dateStr = niceDate(iso);
-    const timeStr = niceTime(t);
-
-    const scheduledBody = `${n ? n+"'" : "(student name)'"}s annual case conference meeting is scheduled for ${dStr}, ${dateStr} at ${timeStr} at ${loc}. We look forward to meeting with you.`;
-    const reminderBody = `This is a reminder that ${n || '(student name)'} has a scheduled annual case conference meeting scheduled for ${dStr}, ${dateStr}, ${timeStr} at ${loc}. We look forward to meeting with you.`;
-
-    sub1.textContent = 'Scheduled Annual Case Conference';
-    body1.textContent = scheduledBody;
-    sub2.textContent = 'Annual Case Conference Meeting Reminder';
-    body2.textContent = reminderBody;
-
-    localStorage.setItem('iep_loc_sel', locationSel.value);
-    localStorage.setItem('iep_loc_other', locationOther.value || '');
-    localStorage.setItem('iep_cc_email', ccSel.value || '');
-
-    flash('Generated.');
-  }
-
-  function flash(msg){
-    status.textContent = msg; status.classList.add('ok');
-    setTimeout(()=>{status.textContent=''; status.classList.remove('ok');}, 1600);
-  }
-
-  function openGmail(which){
-    const subject = which===1 ? sub1.textContent : sub2.textContent;
-    const body = which===1 ? body1.textContent : body2.textContent;
-    const cc = ccSel.value || '';
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}${cc?`&cc=${encodeURIComponent(cc)}`:''}`;
-    window.open(url, '_blank', 'noopener');
-  }
-
-  $('#generate').addEventListener('click', gen);
-  $('#clear').addEventListener('click', ()=>{ student.value=''; date.value=''; time.value=''; flash('Cleared.'); });
-
-  document.querySelectorAll('[data-copy]').forEach(btn=>{
-    btn.addEventListener('click', async()=>{
-      const id = btn.getAttribute('data-copy');
-      const text = document.getElementById(id).textContent;
-      try{ await navigator.clipboard.writeText(text); flash('Copied.'); }
-      catch(e){ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); flash('Copied.'); }
-    })
-  });
-
-  document.querySelectorAll('[data-gmail]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const which = Number(btn.getAttribute('data-gmail'));
-      openGmail(which);
+  function setActive(index){
+    tabs.forEach((t,i)=>{
+      t.btn.setAttribute('aria-selected', i===index ? 'true':'false');
+      t.panel.classList.toggle('hidden', i!==index);
     });
-  });
+    activeIndex=index;
+  }
+  let activeIndex=1; // default Follow Up
+  tabs[0].btn.addEventListener('click', ()=>setActive(0));
+  tabs[1].btn.addEventListener('click', ()=>setActive(1));
+  tabs[2].btn.addEventListener('click', ()=>setActive(2));
 
-  [student, date, time].forEach(el=>{
-    el.addEventListener('change', gen);
-    el.addEventListener('keyup', (e)=>{ if(e.key==='Enter') gen(); });
+  function dayName(iso){if(!iso)return '(Day)';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString(undefined,{weekday:'long'})}
+  function dateNice(iso){if(!iso)return '(Date)';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})}
+  function timeNice(t){if(!t)return '(Time)';try{const[hh,mm]=t.split(':').map(Number);const ampm=hh>=12?'PM':'AM';const h12=((hh+11)%12)+1;return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`}catch(e){return '(Time)'}}
+  function firstName(full){ if(!full) return ''; const parts=full.trim().split(/\s+/); return parts[0]||''; }
+
+  function gen(){
+    const nFull=(student.value||'').trim();
+    const nFirst=firstName(nFull)||'(Student First Name)';
+    const dStr=dayName(date.value), dateStr=dateNice(date.value), timeStr=timeNice(time.value);
+    const location=loc.value||'(Location)';
+    const teacherName=(teacher.value||'(Teacher Name)');
+
+    // Invitation
+    $('subject-invite').textContent='Scheduling an Annual Case Conference Meeting';
+    $('body-invite').textContent=`Hello,\n\nAs the time approaches to review ${nFirst}’s Individualized Education Program (IEP), I’d like to schedule our annual case conference meeting. This meeting allows us to share updates on ${nFirst}’s progress, gather your input, and collaborate on plans for the year ahead.\n\nWould ${dStr}, ${dateStr} at ${timeStr} at ${location} work for you? If that time is not convenient, please let me know an alternative that fits your schedule. We can meet in person at Wawasee High School, virtually through Google Meet, or by phone—whichever works best for you.\n\nPlease reply to this email or call (574) 457-3147 ext. 2308 to confirm or suggest another option. Thank you for your continued partnership in supporting ${nFirst}’s education.\n\nSincerely,\n${teacherName}\nSpecial Education Teacher\nWawasee High School`;
+
+    // Follow Up (Scheduled)
+    $('subject-follow').textContent='Scheduled Annual Case Conference';
+    $('body-follow').textContent=`${nFull ? nFull+"'" : "(Student Name)'"}s annual case conference meeting is scheduled for ${dStr}, ${dateStr} at ${timeStr} at ${location}. We look forward to meeting with you.`;
+
+    // Reminder
+    $('subject-remind').textContent='Annual Case Conference Meeting Reminder';
+    $('body-remind').textContent=`This is a reminder that ${nFull || '(Student Name)'} has a scheduled annual case conference meeting on ${dStr}, ${dateStr} at ${timeStr} at ${location}. We look forward to meeting with you.`;
+  }
+
+  // Generate now and on changes
+  function wire(el){ el.addEventListener('change', gen); el.addEventListener('keyup', e=>{ if(e.key==='Enter') gen(); }); }
+  [student,date,time,loc,teacher,ccSel].forEach(wire);
+  $('generate').addEventListener('click', gen);
+  gen();
+
+  // Open the active panel in Gmail
+  $('openGmail').addEventListener('click', ()=>{
+    const t = tabs[activeIndex];
+    const subject = t.sub.textContent;
+    const body = t.body.textContent;
+    const ccMap={
+      'Jesse Ritter':'jritter@wawasee.k12.in.us',
+      'Christy Troutman':'ctroutman@wawasee.k12.in.us',
+      'Kari Baker':'kbaker@wawasee.k12.in.us',
+      'Wendy Ortiz':'wortiz@wawasee.k12.in.us',
+      'David Shipley':'dshipley@wawasee.k12.in.us',
+      'Jill Hackleman':'Jill.hackleman@wawasee.k12.in.us'
+    };
+    const ccName=ccSel.value||''; const ccEmail=ccMap[ccName]||'';
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}${ccEmail?`&cc=${encodeURIComponent(ccEmail)}`:''}`;
+    window.open(url,'_blank','noopener');
   });
-  locationSel.addEventListener('change', ()=>{ toggleOther(); gen(); });
-  locationOther.addEventListener('input', gen);
-  ccSel.addEventListener('change', ()=>{ ccEmail.value = ccSel.value; gen(); });
+})();
+</script>
+<script>
+// Populate CC dropdown on load
+(function(){
+  const ccSel=document.getElementById('ccSel');
+  const names=['— CC: select teacher —','Jesse Ritter','Christy Troutman','Kari Baker','Wendy Ortiz','David Shipley','Jill Hackleman'];
+  ccSel.innerHTML = names.map((n,i)=>`<option value="${i===0?'':n}">${n}</option>`).join('');
 })();
 </script>
 </body>
